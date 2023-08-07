@@ -5,13 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.sns.domain.dto.user.UserRequestDto;
 import mutsa.sns.domain.dto.user.UserResponseDto;
-import mutsa.sns.exception.CustomException;
-import mutsa.sns.exception.ErrorCode;
-import mutsa.sns.security.CustomUserDetailsManager;
 import mutsa.sns.security.jwt.JwtRequestDto;
 import mutsa.sns.security.jwt.JwtResponseDto;
 import mutsa.sns.service.UserService;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +22,6 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
-    private final CustomUserDetailsManager manager;
 
     @PostMapping("/sign")
     public UserResponseDto sign(@Valid @RequestBody UserRequestDto userDto){
@@ -48,8 +43,8 @@ public class UserController {
     }
 
     @PutMapping(value = "/profile/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserResponseDto updateProfileImage(@RequestBody() MultipartFile image, Authentication auth) throws IOException {
-
+    public UserResponseDto updateProfileImage(@RequestBody MultipartFile image, Authentication auth) throws IOException {
+        log.info("updateProfileImage().auth.getName() = {} " , auth.getName());
         return userService.updateProfileImage(image, auth.getName());
 
     }

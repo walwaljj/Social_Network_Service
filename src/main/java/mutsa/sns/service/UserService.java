@@ -97,12 +97,12 @@ public class UserService {
             new CustomException(ErrorCode.IMAGE_NOT_FOUND);
 
         }
-
-        if(!userEntity.getProfileImgUrl().isEmpty()){
-            imageService.deleteImage(username);
-        }
+        // TODO 이미 프로필 이미지가 있을 때 삭제코드 (삭제하지 않으면 이미지가 쌓임..)
+//        if(!userEntity.getProfileImgUrl().isBlank()){
+//            imageService.deleteImage(username);
+//        }
         // 이미지 업로드
-        Path profileImgUrl = imageService.uploadImage(username ,image);
+        Path profileImgUrl = imageService.uploadProfileImage(username ,image);
         userEntity.setProfileImgUrl(String.valueOf(profileImgUrl));
 
         return UserResponseDto.fromEntity(userRepository.save(userEntity));
