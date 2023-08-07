@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,13 +24,14 @@ public class ArticleController {
     @PostMapping(value ="/{username}/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    @PreAuthorize("#username == new Authentication().getName()")
     public ArticleResponseDto write(@PathVariable String username, Authentication auth,
-                                    @RequestBody MultipartFile image,
-                                    @RequestBody ArticleRequestDto articleRequestDto) throws IOException {
+                                    @RequestParam List<MultipartFile> image,
+                                    @RequestParam String title,
+                                    @RequestParam String content) throws IOException {
 
         if(!auth.getName().equals(username)){
             new CustomException(ErrorCode.INVALID_PERMISSION);
         }
-        return articleService.write(username, image, articleRequestDto);
+        return articleService.write(username, image, title , content);
     }
 
 }
