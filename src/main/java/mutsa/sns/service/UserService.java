@@ -14,18 +14,16 @@ import mutsa.sns.security.config.PasswordEncoderConfig;
 import mutsa.sns.security.jwt.JwtRequestDto;
 import mutsa.sns.security.jwt.JwtResponseDto;
 import mutsa.sns.security.jwt.JwtUtils;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+
 import java.io.IOException;
-import java.nio.file.Files;
+
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -83,19 +81,18 @@ public class UserService {
     }
 
     public UserResponseDto findByUserName(String username){
-        return UserResponseDto.fromEntity(userRepository.findByUsername(username).orElseThrow(() ->
-                new CustomException(ErrorCode.NOT_FOUND, username)));
+        return UserResponseDto.fromEntity(userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username)));
 
     }
 
     public UserResponseDto updateProfileImage(MultipartFile image, String username) throws IOException {
 
-        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() ->
-                new CustomException(ErrorCode.NOT_FOUND, username));
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
 
-        if(image.isEmpty()){
-            new CustomException(ErrorCode.IMAGE_NOT_FOUND);
-
+        if(image.isEmpty() || image == null){
+            return UserResponseDto.fromEntity(userRepository.save(userEntity));
         }
         // TODO 이미 프로필 이미지가 있을 때 삭제코드 (삭제하지 않으면 이미지가 쌓임..)
 //        if(!userEntity.getProfileImgUrl().isBlank()){

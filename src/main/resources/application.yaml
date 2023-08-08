@@ -20,6 +20,9 @@ spring:
   web:
     resources:
       static-locations: file:media/,classpath:/static
+  mvc:
+    #
+    static-path-pattern: /static/**
 
 jwt:
   secret: jjjjjjjjjjjjjjjjjjjjjjjjjjjjjsssssssssssssssssssssssssssssshhhhhhhhhhhhhhhhhhhhhhhhhhhh

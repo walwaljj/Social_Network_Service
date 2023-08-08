@@ -1,11 +1,8 @@
 package mutsa.sns.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
-
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Value;
 @Entity
 @Builder
 @Getter
@@ -25,5 +22,6 @@ public class UserEntity {
     private String phoneNumber;
     @Setter
     private String profileImgUrl;
+
 
 }
