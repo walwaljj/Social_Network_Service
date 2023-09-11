@@ -8,14 +8,10 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_USER: ${{ secrets.MYSQL_ROOT_USER }}
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent"
+    steps:
+      - name: test
+        run: |
+          echo "test : ${{ secrets.MYSQL_ROOT_USER }}"
+
