@@ -38,7 +38,6 @@ public class ArticleResponseDto {
                 .articleImageUrlList(imageUrlToString(entity.getArticleImageUrlList()))
                 .build();
     }
-
     public static List<String> imageUrlToString(List<ArticleImageEntity> imageUrlList){
         List<String> stringImageUrlList = new ArrayList<>();
 
