@@ -45,7 +45,6 @@ public class ArticleResponseDto {
             for (ArticleImageEntity articleEntity : imageUrlList) {
                 stringImageUrlList.add(articleEntity.getImageUrl());
             }
-            return stringImageUrlList;
         }
         return stringImageUrlList;
     }

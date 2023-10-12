@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,8 @@ public class ArticleService {
     private final ImageService imageService;
     private final CommentService commentService;
     private final ArticleImageRepository articleImageRepository;
-    public ArticleResponseDto write(String username , List<MultipartFile> image,String title, String content) throws IOException {
+
+    public ArticleResponseDto write(String username, List<MultipartFile> image, String title, String content) throws IOException {
 
         // user 이름으로 userEntity 찾기
         UserEntity userEntity = userRepository.findByUsername(username)
@@ -45,21 +47,36 @@ public class ArticleService {
                 .content(content)
                 .build();
 
-        ArticleEntity entity = articleRepository.save(articleEntity);
+        // 게시물 저장.
+        ArticleEntity articleSave = articleRepository.save(articleEntity);
 
-        if(image == null){
-            imageService.uploadArticleImage(username,articleEntity.getId(),null);
-        }
-        else {
+        List<ArticleImageEntity> articleImageUrlList = new ArrayList<>();
+
+        // imagePath 를 저장할 변수
+        String imagePath;
+
+        // 이미지가 없다면
+        if (image == null) {
+            imagePath = imageService.uploadArticleImage(username, articleSave.getId(), null).toString();
+            log.info("imagePath={}", imagePath);
+            ArticleImageEntity articleImageEntity = ArticleImageEntity.fromFileName(imagePath);
+            articleImageUrlList.add(articleImageEntity);
+        } else {
             // list 형태의 image 를 하나씩 업로드
             for (MultipartFile multipartFile : image) {
-                imageService.uploadArticleImage(username, articleEntity.getId(), multipartFile);
+                imagePath = imageService.uploadArticleImage(username, articleSave.getId(), multipartFile).toString();
+                articleImageUrlList.add(ArticleImageEntity.fromFileName(imagePath));
             }
         }
+
+        articleEntity.setArticleImageUrlList(articleImageUrlList);
+
+        ArticleEntity entity = articleRepository.save(articleEntity);
+
         return ArticleResponseDto.fromEntity(entity);
     }
 
-    public List<ArticleEntity> findAllArticleByUserId(UserEntity user){
+    public List<ArticleEntity> findAllArticleByUserId(UserEntity user) {
         Optional<List<ArticleEntity>> optionalArticleList = articleRepository.findByUserId(user.getId());
 
         return optionalArticleList.orElseGet(null);
@@ -70,7 +87,7 @@ public class ArticleService {
         List<ArticleResponseDto> articleResponseList = new ArrayList<>();
 
         UserEntity userEntity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,username));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
 
         List<ArticleEntity> articleEntities = articleRepository.findByUserId(userEntity.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username + "님의 글"));
@@ -97,25 +114,25 @@ public class ArticleService {
 
     }
 
-    public List<ArticleResponseDto> readAll(String username){
+    public List<ArticleResponseDto> readAll(String username) {
         List<ArticleResponseDto> articleListByUsername = findAllArticlesByUsername(username);
         String imageUrl;
         List<ArticleResponseDto> articleList = new ArrayList<>();
         for (ArticleResponseDto articleResponseDto : articleListByUsername) {
             imageUrl = articleResponseDto.getArticleImageUrlList().stream().findFirst().get();
 
-            articleList.add(ArticleResponseDto.showArticleList(articleResponseDto , imageUrl));
+            articleList.add(ArticleResponseDto.showArticleList(articleResponseDto, imageUrl));
         }
 
         return articleList;
 
     }
 
-    public void delete(String username,Integer articleId) throws IOException {
+    public void delete(String username, Integer articleId) throws IOException {
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username + " 님의 " + articleId + "번째 글"));
 
-        imageService.deleteImage(username,articleId);
+        imageService.deleteImage(username, articleId);
         commentService.deleteAllComments(articleId);
         articleRepository.delete(articleEntity);
 

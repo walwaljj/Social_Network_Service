@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name = "article_images")
 @NoArgsConstructor
@@ -25,5 +24,9 @@ public class ArticleImageEntity {
         return ArticleImageEntity.builder()
                 .imageUrl(fileName)
                 .build();
+    }
+
+    public void updateArticle(ArticleEntity article){
+        this.article = article;
     }
 }

@@ -34,10 +34,10 @@ public class ArticleEntity {
     @OneToMany(mappedBy = "article")
     @Setter
     private List<CommentEntity> comments;
+
     @OneToMany(mappedBy = "article")
-    @Nullable
     @Setter
     @JsonIgnore
-    private List<ArticleImageEntity> articleImageUrlList = new ArrayList<>();
+    private List<ArticleImageEntity> articleImageUrlList;
 
 }
