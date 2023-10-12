@@ -7,6 +7,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class JwtResponseDto {
+
     private String username;
     private String token;
 

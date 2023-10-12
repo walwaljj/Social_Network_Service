@@ -3,6 +3,7 @@ package mutsa.sns.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
+
 @Entity
 @Builder
 @Getter
@@ -10,9 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(nullable = false , unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
     private String password;

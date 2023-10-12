@@ -48,6 +48,7 @@ public class ImageService {
     }
 
 
+    // 프로필 이미지 업로드
     public Path uploadProfileImage(String username ,MultipartFile image) throws IOException {
 
         String name = String.format("/%s/profile", username);
@@ -64,17 +65,22 @@ public class ImageService {
 
     }
 
+    // 이미지를 업로드 하고, 주소를 반환하는 메서드
     public Path uploadArticleImage(String username ,Integer articleId , MultipartFile image) throws IOException {
 
+        // 이미지가 저장될 폴더를 만듦
         String name = String.format("/%s/article_%s", username, articleId);
         String folderName = makeFolder(name);
 
+        // 전달 받은 게시글의 id(articleId)를 통해 게시글을 찾아봄.
         ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
-        ArticleImageEntity articleImageEntity = new ArticleImageEntity();
-        articleImageEntity.setArticle(articleEntity);
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND)); // 게시글이 없다면 notfound 반환
 
-        // 이미지가 없을 때 default 이미지 저장.
+        // 있다면 게시글 이미지 엔티티에 게시글 정보를 업데이트함.
+        ArticleImageEntity articleImageEntity = new ArticleImageEntity();
+        articleImageEntity.updateArticle(articleEntity);
+
+        // 전달받은 이미지가 null 이면 default 이미지를 주소를 저장 하는 로직.
         if(image == null){
             log.info("defaultArticleImgUrl = {}",String.format("%s/default.png",folderName));
             Path defaultArticleImgUrl = Path.of(String.format("%s/default.png",folderName));
@@ -83,16 +89,17 @@ public class ImageService {
             articleImageRepository.save(articleImageEntity);
             return defaultArticleImgUrl;
         }
+
         // 현재 시간을 파일이름 저장
         LocalDateTime now = LocalDateTime.now();
         log.info("articleImgUrl = {}",String.format("%s/%s.png",folderName, now.toString().replace(":", "")));
         Path articleImgUrl = Path.of(String.format("%s/%s.png",folderName, now.toString().replace(":", "")));
         log.info("게시글 이미지 저장 완료");
         image.transferTo(articleImgUrl);
-        articleImageEntity.setImageUrl(articleImgUrl.toString());
-        articleImageRepository.save(articleImageEntity);
+        articleImageEntity.setImageUrl(articleImgUrl.toString()); // 이미지 경로를 저장함.
+        articleImageRepository.save(articleImageEntity); // 이미지 경로 저장.
 
-        return articleImgUrl;
+        return articleImgUrl; // 주소 반환.
 
     }
 
