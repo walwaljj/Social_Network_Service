@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import mutsa.sns.security.jwt.JwtFilter;
 import mutsa.sns.security.jwt.JwtUtils;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,15 +20,15 @@ public class WebFilterChainConfig{
 
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "user/login","/user/sign")
+                        .requestMatchers( "users/login","/users/sign")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .logout( logout -> logout
                         .deleteCookies("jwtToken")
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-                        .logoutSuccessUrl("/user/login"))
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
+                        .logoutSuccessUrl("/users/login"))
 
                 .build();
     }
