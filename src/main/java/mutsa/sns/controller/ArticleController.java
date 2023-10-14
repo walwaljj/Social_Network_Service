@@ -44,6 +44,9 @@ public class ArticleController {
         return articleService.readArticle(username, articleId);
     }
 
+    /**
+     * 특정 user 의 모든 게시글 읽기 - username 으로 조회
+     */
     @GetMapping("/read/{username}")
     public List<ArticleResponseDto> readSaleItemAll(@PathVariable(value = "username") String username) {
         return articleService.readAll(username);
@@ -62,7 +65,10 @@ public class ArticleController {
         return articleService.updateArticle(articleId, auth.getName(), title, content, image);
     }
 
-    @DeleteMapping("/{articleId}/delete/")
+    /**
+     * 게시글 삭제
+     */
+    @DeleteMapping("/{articleId}/delete")
     public void delete(Authentication auth,
                        @PathVariable(value = "articleId") Integer articleId) throws IOException {
 
@@ -71,10 +77,9 @@ public class ArticleController {
 
     /**
      * 해당 게시글을 좋아한 유저 목록 보기
-     * */
-    @PutMapping(value = "/{articleId}/like-user")
-    public LikeResponseDto likeUserList(@PathVariable(value = "articleId") Integer articleId) {
-
+     */
+    @GetMapping(value = "/{articleId}/like-user")
+    public List<LikeResponseDto> likeUserList(@PathVariable(value = "articleId") Integer articleId) {
         return likeService.likeUserList(articleId);
     }
 

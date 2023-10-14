@@ -6,25 +6,19 @@ import lombok.*;
 @Entity
 @Setter
 @Getter
+@Builder
 @Table(name = "Like_article")
 @NoArgsConstructor
 @AllArgsConstructor
 public class LikeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne
-    @JoinColumn(name = "article_id")
-    private ArticleEntity article;
+
+    private Integer articleId;
+
     @JoinColumn(name = "user_id")
     private Integer userId;
-    private boolean status; // true == like
-
-    public boolean likeStatus() {
-        return this.status;
-    }
-
-
-
-
 
 }
