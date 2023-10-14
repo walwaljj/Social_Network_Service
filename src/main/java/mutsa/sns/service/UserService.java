@@ -8,6 +8,7 @@ import mutsa.sns.domain.dto.user.UserResponseDto;
 import mutsa.sns.domain.entity.UserEntity;
 import mutsa.sns.exception.CustomException;
 import mutsa.sns.exception.ErrorCode;
+import mutsa.sns.repository.LikeRepository;
 import mutsa.sns.repository.UserRepository;
 import mutsa.sns.security.CustomUserDetailsManager;
 import mutsa.sns.security.config.PasswordEncoderConfig;
@@ -24,7 +25,6 @@ import java.io.IOException;
 
 import java.nio.file.Path;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -36,13 +36,18 @@ public class UserService {
     private final CustomUserDetailsManager manager;
     private final JwtUtils jwtUtils;
     private final ImageService imageService;
-    public UserResponseDto sign(UserRequestDto userRequestDto){
+    private final LikeRepository likeRepository;
 
-        if(manager.userExists(userRequestDto.getUsername())){
+    /**
+     * 회원가입
+     */
+    public UserResponseDto sign(UserRequestDto userRequestDto) {
+
+        if (manager.userExists(userRequestDto.getUsername())) {
             throw new CustomException(ErrorCode.DUPLICATED_USER);
         }
 
-        if(!userRequestDto.getPassword().equals(userRequestDto.getPasswordReChk())){
+        if (!userRequestDto.getPassword().equals(userRequestDto.getPasswordReChk())) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
@@ -55,32 +60,32 @@ public class UserService {
 
     }
 
+    /**
+     * 로그인
+     */
     public JwtResponseDto login(JwtRequestDto userDto) {
 
-        if(!manager.userExists(userDto.getUsername())){
-            throw new CustomException(ErrorCode.NOT_FOUND,userDto.getUsername());
+        if (!manager.userExists(userDto.getUsername())) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
         UserDetails userDetails = manager.loadUserByUsername(userDto.getUsername());
 
-        if(!passwordEncoder.passwordEncoder().matches(userDto.getPassword(), userDetails.getPassword())){
+        if (!passwordEncoder.passwordEncoder().matches(userDto.getPassword(), userDetails.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
 
         JwtResponseDto userResponseDto = JwtResponseDto.builder().username(userDto.getUsername())
-                                                .token(jwtUtils.generateToken(userDetails)).build();
+                .token(jwtUtils.generateToken(userDetails)).build();
 
-        log.info("tokenDto = {} ",userResponseDto.getToken());
+        log.info("tokenDto = {} ", userResponseDto.getToken());
 
         return userResponseDto;
     }
 
-    public void logout(){
 
-    }
-
-    public UserResponseDto findByUserName(String username){
+    public UserResponseDto findByUserName(String username) {
         return UserResponseDto.fromEntity(userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username)));
 
@@ -91,15 +96,13 @@ public class UserService {
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
 
-        if(image.isEmpty() || image == null){
+        if (image.isEmpty() || image == null) {
             return UserResponseDto.fromEntity(userRepository.save(userEntity));
         }
         // TODO 이미 프로필 이미지가 있을 때 삭제코드 (삭제하지 않으면 이미지가 쌓임..)
-//        if(!userEntity.getProfileImgUrl().isBlank()){
-//            imageService.deleteImage(username);
-//        }
+
         // 이미지 업로드
-        Path profileImgUrl = imageService.uploadProfileImage(username ,image);
+        Path profileImgUrl = imageService.uploadProfileImage(username, image);
         userEntity.setProfileImgUrl(String.valueOf(profileImgUrl));
 
         return UserResponseDto.fromEntity(userRepository.save(userEntity));

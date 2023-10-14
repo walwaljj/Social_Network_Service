@@ -18,15 +18,18 @@ public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(nullable = false)
     private String comment;
+
     @ManyToOne
     @JoinColumn(name = "article_id")
     @JsonBackReference
     private ArticleEntity article;
-//    @ManyToOne
+
     @JoinColumn(name = "user_id")
     private Integer userId;
+
     @Column(nullable = false)
     private String username;
 

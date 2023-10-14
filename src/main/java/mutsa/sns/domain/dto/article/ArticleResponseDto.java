@@ -2,20 +2,19 @@ package mutsa.sns.domain.dto.article;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import mutsa.sns.domain.entity.ArticleEntity;
 import mutsa.sns.domain.entity.ArticleImageEntity;
 import mutsa.sns.domain.entity.CommentEntity;
-import mutsa.sns.domain.entity.UserEntity;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@NoArgsConstructor
+@AllArgsConstructor
 public class ArticleResponseDto {
 
     private Integer id;
@@ -35,18 +34,17 @@ public class ArticleResponseDto {
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .userId(entity.getUserId())
-                .articleImageUrlList(imageUrlToString(entity.getArticleImageUrlList()))
+                .articleImageUrlList(entity.getArticleImageUrlList().stream()
+                        .map(ArticleImageEntity::getImageUrl)
+                        .collect(Collectors.toList()))
                 .build();
     }
-    public static List<String> imageUrlToString(List<ArticleImageEntity> imageUrlList){
-        List<String> stringImageUrlList = new ArrayList<>();
 
-        if(imageUrlList.size() != 0){
-            for (ArticleImageEntity articleEntity : imageUrlList) {
-                stringImageUrlList.add(articleEntity.getImageUrl());
-            }
-        }
-        return stringImageUrlList;
+    public static List<String> imageUrlToString(List<ArticleImageEntity> imageUrlList){
+
+        return imageUrlList.stream()
+                .map(ArticleImageEntity::getImageUrl)
+                .collect(Collectors.toList());
     }
 
     public static ArticleResponseDto showArticleList(ArticleResponseDto articleResponseDto, String articleImageUrl){

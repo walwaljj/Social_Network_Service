@@ -2,7 +2,6 @@ package mutsa.sns.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Value;
 
 @Builder
 @Getter
@@ -12,11 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 @AllArgsConstructor
 public class ArticleImageEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @ManyToOne
     @JoinColumn(name = "article_id")
     private ArticleEntity article;
+
     @Setter
     private String imageUrl;
 
@@ -26,7 +28,7 @@ public class ArticleImageEntity {
                 .build();
     }
 
-    public void updateArticle(ArticleEntity article){
+    public void updateArticle(ArticleEntity article) {
         this.article = article;
     }
 }

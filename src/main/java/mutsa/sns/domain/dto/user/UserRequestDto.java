@@ -9,7 +9,6 @@ import lombok.Getter;
 @Getter
 public class UserRequestDto {
 
-//    private Integer id;
     @NotEmpty(message = "사용자ID는 빈 값일 수 없습니다.")
     private String username;
     @NotEmpty(message = "비밀번호는 빈 값일 수 없습니다.")

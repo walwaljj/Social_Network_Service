@@ -1,14 +1,10 @@
 package mutsa.sns.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Value;
+import mutsa.sns.domain.dto.article.ArticleRequestDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,15 +16,21 @@ import java.util.List;
 @Entity
 @Table(name = "article")
 public class ArticleEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-//    @ManyToOne
+
     @JoinColumn(name = "user_id")
     private Integer userId;
+
+    @Setter
     private String title;
+
     private String content;
+
     private boolean draft;
+
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "article")
@@ -37,7 +39,6 @@ public class ArticleEntity {
 
     @OneToMany(mappedBy = "article")
     @Setter
-    @JsonIgnore
     private List<ArticleImageEntity> articleImageUrlList;
 
 }
