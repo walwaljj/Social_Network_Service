@@ -11,13 +11,11 @@ import mutsa.sns.exception.CustomException;
 import mutsa.sns.exception.ErrorCode;
 import mutsa.sns.repository.ArticleImageRepository;
 import mutsa.sns.repository.ArticleRepository;
-import mutsa.sns.repository.CommentRepository;
 import mutsa.sns.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,15 +38,13 @@ public class ArticleService {
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
 
-        // articleRequestDto 를 바탕으로 ArticleEntity 생성
-        ArticleEntity articleEntity = ArticleEntity.builder()
+        // 게시물 저장.
+        ArticleEntity articleSave = articleRepository.save(ArticleEntity.builder()
                 .userId(userEntity.getId())
                 .title(title)
                 .content(content)
-                .build();
-
-        // 게시물 저장.
-        ArticleEntity articleSave = articleRepository.save(articleEntity);
+                .build()
+        );
 
         List<ArticleImageEntity> articleImageUrlList = new ArrayList<>();
 
@@ -59,8 +55,8 @@ public class ArticleService {
         if (image == null) {
             imagePath = imageService.uploadArticleImage(username, articleSave.getId(), null).toString();
             log.info("imagePath={}", imagePath);
-            ArticleImageEntity articleImageEntity = ArticleImageEntity.fromFileName(imagePath);
-            articleImageUrlList.add(articleImageEntity);
+            articleImageUrlList.add(ArticleImageEntity.builder().article(articleSave).imageUrl(imagePath).build());
+            log.info("articleImageUrlList = {}", articleImageUrlList.get(0).getImageUrl());
         } else {
             // list 형태의 image 를 하나씩 업로드
             for (MultipartFile multipartFile : image) {
@@ -69,11 +65,9 @@ public class ArticleService {
             }
         }
 
-        articleEntity.setArticleImageUrlList(articleImageUrlList);
-
-        ArticleEntity entity = articleRepository.save(articleEntity);
-
-        return ArticleResponseDto.fromEntity(entity);
+        articleSave.setArticleImageUrlList(articleImageUrlList);
+        log.info("articleImageUrlList = {}", articleSave.getArticleImageUrlList().get(0).getImageUrl());
+        return ArticleResponseDto.fromEntity(articleRepository.save(articleSave));
     }
 
     public List<ArticleEntity> findAllArticleByUserId(UserEntity user) {
@@ -136,5 +130,39 @@ public class ArticleService {
         commentService.deleteAllComments(articleId);
         articleRepository.delete(articleEntity);
 
+    }
+
+    /**
+     * 수정
+     */
+    public ArticleResponseDto updateArticle(Integer articleId, String username, String title, String content, List<MultipartFile> image) throws IOException {
+
+        ArticleEntity articleEntity = articleRepository.findById(articleId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        UserEntity userEntity = userRepository.findById(articleEntity.getUserId()).get();
+
+        if(!userEntity.getUsername().equals(username)){
+            throw new CustomException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        List<ArticleImageEntity> articleImageUrlList = articleEntity.getArticleImageUrlList();
+
+        String imagePath;
+
+        // 변경할 이미지가 있다면
+        if (image != null) {
+            for (MultipartFile multipartFile : image) {
+                imagePath = imageService.uploadArticleImage(username, articleEntity.getId(), multipartFile).toString();
+                if(articleImageUrlList.get(0).getImageUrl().contains("article_"+articleId+"/default.png")){
+                    articleImageUrlList.remove(0);
+                }
+                articleImageUrlList.add(ArticleImageEntity.fromFileName(imagePath));
+            }
+        }
+
+        articleEntity.setArticleImageUrlList(articleImageUrlList);
+
+        return ArticleResponseDto.fromEntity(articleRepository.save(articleEntity));
     }
 }
