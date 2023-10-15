@@ -9,8 +9,8 @@ import mutsa.sns.domain.entity.ArticleImageEntity;
 import mutsa.sns.domain.entity.UserEntity;
 import mutsa.sns.exception.CustomException;
 import mutsa.sns.exception.ErrorCode;
-import mutsa.sns.repository.ArticleImageRepository;
 import mutsa.sns.repository.ArticleRepository;
+import mutsa.sns.repository.LikeRepository;
 import mutsa.sns.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +30,9 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final ImageService imageService;
     private final CommentService commentService;
-    private final ArticleImageRepository articleImageRepository;
+    private final LikeRepository likeRepository;
+    private final LikeService likeService;
+    private final UserService userService;
 
     public ArticleResponseDto write(String username, List<MultipartFile> image, String title, String content) throws IOException {
 
@@ -122,13 +124,32 @@ public class ArticleService {
 
     }
 
+    /**
+     * 개시글 삭제 하기
+     * */
     public void delete(String username, Integer articleId) throws IOException {
+        // 게시글 찾기
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username + " 님의 " + articleId + "번째 글"));
+
+        // 유저 찾기
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        
+        // 검사
+        if(articleEntity.getUserId().equals(userEntity.getId())){
+            throw new CustomException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        // 좋아요 기록 삭제
+        if(likeRepository.findByUserIdAndArticleId(userEntity.getId(),articleId).isPresent()){
+            likeService.userCancelLike(articleId,username);
+        }
 
         imageService.deleteImage(username, articleId);
         commentService.deleteAllComments(articleId);
         articleRepository.delete(articleEntity);
+        
 
     }
 
