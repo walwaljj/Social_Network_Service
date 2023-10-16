@@ -74,7 +74,7 @@ public class ImageService {
 
         // 전달 받은 게시글의 id(articleId)를 통해 게시글을 찾아봄.
         ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND)); // 게시글이 없다면 notfound 반환
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND)); // 게시글이 없다면 notfound 반환
 
         // 있다면 게시글 이미지 엔티티에 게시글 정보를 업데이트함.
         ArticleImageEntity articleImageEntity = new ArticleImageEntity();

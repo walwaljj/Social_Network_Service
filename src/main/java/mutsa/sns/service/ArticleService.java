@@ -38,7 +38,7 @@ public class ArticleService {
 
         // user 이름으로 userEntity 찾기
         UserEntity userEntity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 게시물 저장.
         ArticleEntity articleSave = articleRepository.save(ArticleEntity.builder()
@@ -83,10 +83,10 @@ public class ArticleService {
         List<ArticleResponseDto> articleResponseList = new ArrayList<>();
 
         UserEntity userEntity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<ArticleEntity> articleEntities = articleRepository.findByUserId(userEntity.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username + "님의 글"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
 
         for (ArticleEntity articleEntity : articleEntities) {
             articleResponseList.add(ArticleResponseDto.builder()
@@ -106,7 +106,7 @@ public class ArticleService {
         List<ArticleResponseDto> articleListByUsername = findAllArticlesByUsername(username);
 
         return articleListByUsername.stream().filter(article -> article.getId().equals(articleId)).findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username + " 님의 " + articleId + "번째 글"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
 
     }
 
@@ -130,7 +130,7 @@ public class ArticleService {
     public void delete(String username, Integer articleId) throws IOException {
         // 게시글 찾기
         ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username + " 님의 " + articleId + "번째 글"));
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
 
         // 유저 찾기
         UserEntity userEntity = userRepository.findByUsername(username)
@@ -159,7 +159,7 @@ public class ArticleService {
     public ArticleResponseDto updateArticle(Integer articleId, String username, String title, String content, List<MultipartFile> image) throws IOException {
 
         ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
 
         UserEntity userEntity = userRepository.findById(articleEntity.getUserId()).get();
 

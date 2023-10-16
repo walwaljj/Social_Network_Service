@@ -31,10 +31,10 @@ public class CommentService {
     public CommentResponseDto save(Integer articleId,String comment, String username){
 
         UserEntity userEntity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, String.format("%d 번째 글", articleId)));
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
 
         CommentEntity commentEntity = CommentEntity.builder()
                 .username(userEntity.getUsername())
@@ -45,10 +45,13 @@ public class CommentService {
     }
 
     private List<CommentEntity> findCommentListByArticleId(Integer articleId){
-        ArticleEntity articleEntity = articleRepository.findById(articleId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        ArticleEntity articleEntity = articleRepository.findById(articleId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
+
         log.info("articleId = {}" , articleId);
         if(!commentRepository.findByArticle(articleEntity).isPresent()){
-            throw  new CustomException(ErrorCode.NOT_FOUND, "답글");
+            throw  new CustomException(ErrorCode.COMMENT_NOT_FOUND);
         }
         return commentRepository.findByArticle(articleEntity).get();
     }

@@ -87,14 +87,17 @@ public class UserService {
 
     public UserResponseDto findByUserName(String username) {
         return UserResponseDto.fromEntity(userRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username)));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)));
 
     }
 
+    /**
+     * 프로필 이미지 업데이트 하기
+     * */
     public UserResponseDto updateProfileImage(MultipartFile image, String username) throws IOException {
 
         UserEntity userEntity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, username));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (image.isEmpty() || image == null) {
             return UserResponseDto.fromEntity(userRepository.save(userEntity));
@@ -107,6 +110,7 @@ public class UserService {
 
         return UserResponseDto.fromEntity(userRepository.save(userEntity));
     }
+
 
 
 }

@@ -58,7 +58,8 @@ public class LikeService {
      */
     public void userCancelLike(Integer articleId, String username) {
         // 게시글 찾기
-        ArticleEntity articleEntity = articleRepository.findById(articleId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+        ArticleEntity articleEntity = articleRepository.findById(articleId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ARTICLE_NOT_FOUND));
 
         // 사용자 찾기
         UserEntity userEntity = userRepository.findByUsername(username).get();
