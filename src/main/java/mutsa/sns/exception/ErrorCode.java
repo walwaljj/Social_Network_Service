@@ -25,6 +25,8 @@ public enum ErrorCode {
 
     // Follow
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND,"팔로우 정보를 찾을 수 없습니다."),
+    NOT_POSSIBLE(HttpStatus.BAD_REQUEST,"자기 자신에게 신청 불가합니다."),
+    DUPLICATION_POSSIBLE(HttpStatus.BAD_REQUEST,"중복 신청은 불가능 합니다."),
 
     // Friend
     FRIEND_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND,"친구 신청 정보를 찾을 수 없습니다."),

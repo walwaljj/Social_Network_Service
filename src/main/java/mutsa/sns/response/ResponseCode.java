@@ -27,7 +27,21 @@ public enum ResponseCode {
     USER_PROFILE_READ(HttpStatus.OK, "200", "사용자 프로필 조회 성공"),
     USER_LIKES_ARTICLE(HttpStatus.OK, "200", "사용자 게시글 좋아요 성공"),
     USER_LIKES_CANCEL_ARTICLE(HttpStatus.NO_CONTENT, "204", "사용자 게시글 좋아요 취소 성공"),
-    USER_LIKES_READ(HttpStatus.OK, "200", "사용자 좋아요 목록 조회 성공");
+    USER_LIKES_READ(HttpStatus.OK, "200", "사용자 좋아요 목록 조회 성공"),
+
+    // FOLLOW
+    USER_FOLLOW_REQUEST(HttpStatus.OK,"201","팔로우 신청 성공"),
+    USER_FOLLOW_CANCEL(HttpStatus.NO_CONTENT,"201","팔로우 취소 완료"),
+    USER_FOLLOW_ARTICLE_LIST(HttpStatus.OK,"200","팔로우한 사용자의 게시글 조회 완료"),
+
+    // FRIEND
+    USER_FRIEND_REQUEST(HttpStatus.OK,"200","친구 신청 완료"),
+    USER_FRIEND_CANCEL(HttpStatus.NO_CONTENT,"201","친구 취소 완료"),
+    USER_FRIEND_REQUEST_ACCEPT(HttpStatus.OK,"200","친구 요청 수락 완료"),
+    USER_FRIEND_REQUEST_REFUSE(HttpStatus.NO_CONTENT,"201","친구 요청 거절 완료"),
+    USER_FRIEND_ARTICLE_LIST(HttpStatus.OK,"200","친구들의 게시글 조회 완료"),
+    USER_FRIENDS_LIST(HttpStatus.OK,"200","친구 목록 조회 완료");
+
 
     private final HttpStatus httpStatus;
     private final String code;
