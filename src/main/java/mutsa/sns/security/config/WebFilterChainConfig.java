@@ -13,22 +13,27 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class WebFilterChainConfig{
+public class WebFilterChainConfig {
     private final JwtUtils jwtUtils;
+
     @Bean
-    public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "users/login","/users/sign")
+                        .requestMatchers("/v1/users/login",
+                                "/v1/users/sign",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/v3/api-docs/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
                 .addFilterBefore(new JwtFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
-                .logout( logout -> logout
+                .logout(logout -> logout
                         .deleteCookies("jwtToken")
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
-                        .logoutSuccessUrl("/users/login"))
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/v1/users/logout"))
+                        .logoutSuccessUrl("/v1/users/login"))
 
                 .build();
     }
