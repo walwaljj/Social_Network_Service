@@ -62,18 +62,16 @@ public class FollowController {
      * 팔로우
      */
     @Operation(summary = "팔로우 신청", description = "팔로우 신청")
-    @PostMapping("/{cancelId}")
-    public ResponseEntity<CommonResponse> follow(@PathVariable Integer cancelId, Authentication auth) {
+    @PostMapping("/{followId}")
+    public ResponseEntity<CommonResponse> follow(@PathVariable Integer followId, Authentication auth) {
 
         ResponseCode userFollowRequest = ResponseCode.USER_FOLLOW_REQUEST;
-
-        followService.followCancel(auth.getName(), cancelId);
 
         return ResponseEntity.ok(
                 CommonResponse.builder()
                         .responseCode(userFollowRequest)
                         .code(userFollowRequest.getCode())
-                        .data(followService.follow(auth.getName(), cancelId))
+                        .data(followService.follow(auth.getName(), followId))
                         .message(userFollowRequest.getMessage())
                         .build()
         );

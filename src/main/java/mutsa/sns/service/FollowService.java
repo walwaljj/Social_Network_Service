@@ -33,8 +33,22 @@ public class FollowService {
 
         Integer userId = userRepository.findByUsername(username).get().getId();
 
-        UserEntity followingEntity = getFollowingUserEntity(followingId);
+        UserEntity followingUserEntity = getFollowingUserEntity(followingId);
 
+        // follow 중복 검증
+        Optional<List<FollowEntity>> userFollowList = followRepository.findByUserId(userId);
+
+        if (userFollowList.isPresent()) { // 사용자의 팔로우 정보가 있다면
+            for (FollowEntity followEntity : userFollowList.get()) {
+                // 현재 팔로우 하려고 하는 id 와 같은지 확인
+                if (followEntity.getFollowingId().equals(followingId)) {
+                    // 같다면 중복 에러 발생
+                    throw new CustomException(ErrorCode.DUPLICATION_POSSIBLE);
+                }
+            }
+        }
+
+        // follow DB 에 중복된 정보가 없다면
         // 해당 정보로 된 follow 생성
         FollowEntity followEntity = FollowEntity.builder()
                 .userId(userId)
@@ -43,7 +57,7 @@ public class FollowService {
 
         followRepository.save(followEntity);
 
-        return FollowResponseDto.toFollowDto(username, followingEntity.getUsername());
+        return FollowResponseDto.toFollowDto(username, followingUserEntity.getUsername());
     }
 
     /**
@@ -54,10 +68,27 @@ public class FollowService {
      */
     private UserEntity getFollowingUserEntity(Integer followingId) {
 
-        UserEntity followingEntity = userRepository.findById(followingId)
+        UserEntity followingUserEntity = userRepository.findById(followingId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return followingEntity;
+        return followingUserEntity;
+    }
+
+    // 팔로우 중복 검증
+    private boolean followingEntityIsEmpty(Integer userId, Integer followingId) {
+
+        Optional<List<FollowEntity>> userFollowList = followRepository.findByUserId(userId);
+
+        if (userFollowList.isPresent()) { // 사용자의 팔로우 정보가 있다면
+            for (FollowEntity followEntity : userFollowList.get()) {
+                // 현재 팔로우 하려고 하는 id 와 같은지 확인
+                if (followEntity.getFollowingId().equals(followingId)) {
+                    // 같다면 중복 에러 발생
+                    throw new CustomException(ErrorCode.DUPLICATION_POSSIBLE);
+                }
+            }
+        }
+        return true;
     }
 
     /**
