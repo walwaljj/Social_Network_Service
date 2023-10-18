@@ -11,12 +11,12 @@ import mutsa.sns.domain.entity.UserEntity;
 @Getter
 public class CommentResponseDto {
     private String comment;
-    private ArticleEntity article;
+    private String title;
     private String username;
 
     public static CommentResponseDto fromEntity(CommentEntity entity){
         return CommentResponseDto.builder()
-                .article(entity.getArticle())
+                .title(entity.getArticle().getTitle())
                 .comment(entity.getComment())
                 .username(entity.getUsername())
                 .build();

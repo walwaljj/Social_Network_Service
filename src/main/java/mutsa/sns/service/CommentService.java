@@ -39,6 +39,7 @@ public class CommentService {
         CommentEntity commentEntity = CommentEntity.builder()
                 .username(userEntity.getUsername())
                 .article(articleEntity)
+                .userId(userEntity.getId())
                 .comment(comment).build();
 
         return CommentResponseDto.fromEntity(commentRepository.save(commentEntity));
@@ -70,14 +71,14 @@ public class CommentService {
         List<CommentEntity> commentListByArticleId = findCommentListByArticleId(articleId);
 
         for (CommentEntity commentEntity : commentListByArticleId) {
-            //  삭제를 시도하는 사용자와 comment 작성자가 일치한지 확인.
-            if(commentEntity.getUsername().equals(username)){
-                throw new CustomException(ErrorCode.INVALID_PERMISSION);
-            }
             // 삭제할 comment 의 Id 와 entity 의 id 를 확인.
             if(commentEntity.getId().equals(commentsId)) {
-                commentRepository.delete(commentEntity);
-                break;
+                //  삭제를 시도하는 사용자와 comment 작성자가 일치한지 확인.
+                if(commentEntity.getUsername().equals(username)){
+                    commentRepository.delete(commentEntity);
+                    break;
+                }
+                else throw new CustomException(ErrorCode.INVALID_PERMISSION);
             }
         }
 

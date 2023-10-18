@@ -16,7 +16,7 @@ public enum ResponseCode {
     ARTICLE_READ(HttpStatus.OK,"200", "게시글 조회 성공"),
     ARTICLE_LIST_READ(HttpStatus.OK,"200", "게시글 전체 조회 성공"),
     ARTICLE_LIKES_READ(HttpStatus.OK,"200", "게시글 좋아요 조회 성공"),
-    COMMENT_CREATE(HttpStatus.OK,"201", "댓글 등록 완료"),
+    COMMENT_CREATE(HttpStatus.OK,"200", "댓글 등록 완료"),
     COMMENT_DELETE(HttpStatus.NO_CONTENT,"201", "댓글 삭제 완료"),
 
     // USER
