@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.sns.response.CommonResponse;
 import mutsa.sns.response.ResponseCode;
-import mutsa.sns.service.FollowService;
 import mutsa.sns.service.FriendService;
-import mutsa.sns.service.LikeService;
-import mutsa.sns.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -106,7 +103,7 @@ public class FriendController {
     @GetMapping("/request-list")
     public ResponseEntity<CommonResponse> friendRequestList(Authentication auth) {
 
-        ResponseCode userFriendRequest = ResponseCode.USER_FRIEND_REQUEST;
+        ResponseCode userFriendRequest = ResponseCode.USER_FRIEND_REQUEST_LIST;
 
         return ResponseEntity.ok(
                 CommonResponse.builder()

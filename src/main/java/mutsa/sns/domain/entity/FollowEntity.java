@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "follow")
 public class FollowEntity {
 
     @Id

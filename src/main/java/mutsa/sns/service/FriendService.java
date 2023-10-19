@@ -37,7 +37,7 @@ public class FriendService {
 
         UserEntity recipientEntity = getUserEntity(recipientId);
 
-        if(isFriendRequestReceive(senderUserEntity,recipientEntity)){
+        if (isFriendRequestReceive(senderUserEntity, recipientEntity)) {
             throw new CustomException(ErrorCode.DUPLICATION_POSSIBLE);
         }
         // 해당 정보로 된 친구 신청 생성
@@ -50,6 +50,9 @@ public class FriendService {
         return FriendResponseDto.getFriendName(username, recipientEntity.getUsername(), FriendStatus.REQUEST);
     }
 
+    /**
+     * 자신에게 신청 방지
+     */
     private static void userCheck(Integer loginUserId, Integer recipientId) {
         if (loginUserId.equals(recipientId)) {
             throw new CustomException(ErrorCode.NOT_POSSIBLE);
@@ -103,10 +106,20 @@ public class FriendService {
      * @param recipient 친구 신청을 받은 User
      */
     private boolean isFriendRequestReceive(UserEntity sender, UserEntity recipient) {
-        Optional<FriendEntity> optionalFriend =
-                friendRepository.findBySenderAndRecipient(sender, recipient);
-        if (optionalFriend.isEmpty()) return false;
-        return true;
+
+        Optional<Set<FriendEntity>> allBySender = friendRepository.findAllBySender(recipient);
+
+        if (allBySender.isEmpty()) {
+            return false;
+        } else {
+            for (FriendEntity friendEntity : allBySender.get()) {
+                if (friendEntity.getRecipient().equals(sender)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -206,26 +219,17 @@ public class FriendService {
         // 로그인 한 user의 Id 찾기
         UserEntity loginUserEntity = userRepository.findByUsername(username).get();
 
-        Set<FriendEntity> resultSet = new HashSet<>();
-
-        Optional<Set<FriendEntity>> allByRecipient = friendRepository.findAllByRecipient(loginUserEntity);
-
-        if (allByRecipient.isPresent()) {
-            resultSet.addAll(allByRecipient.get());
-        }
-
-        Optional<Set<FriendEntity>> allBySender = friendRepository.findAllBySender(loginUserEntity);
-
-        if (allBySender.isPresent()) {
-            resultSet.addAll(allByRecipient.get());
-        }
-
         List<String> friendNameList = new ArrayList<>();
 
-        if (!resultSet.isEmpty()) {
-            for (FriendEntity friendEntity : resultSet) {
-                if (friendEntity.getStatus().equals(FriendStatus.ACCEPTED)) {
-                    friendNameList.add(friendEntity.getRecipient().getUsername());
+        Optional<List<FriendEntity>> allByStatus = friendRepository.findAllByStatus(FriendStatus.ACCEPTED);
+
+        if (allByStatus.isPresent()) {
+            for (FriendEntity friendEntity : allByStatus.get()) {
+                if (friendEntity.getRecipient().equals(loginUserEntity)) {
+                    friendNameList.add(friendEntity.getSender().getUsername());
+                }
+                else if(friendEntity.getSender().equals(loginUserEntity)){
+                    friendNameList.add(friendEntity.getSender().getUsername());
                 }
             }
         }

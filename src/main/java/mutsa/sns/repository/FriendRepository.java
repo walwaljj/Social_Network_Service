@@ -1,6 +1,7 @@
 package mutsa.sns.repository;
 
 import mutsa.sns.domain.entity.FriendEntity;
+import mutsa.sns.domain.entity.FriendStatus;
 import mutsa.sns.domain.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,5 @@ public interface FriendRepository extends JpaRepository<FriendEntity, Integer> {
     Optional<Set<FriendEntity>> findAllBySender(UserEntity userEntity);
     Optional<Set<FriendEntity>> findAllByRecipient(UserEntity userEntity);
     Optional<List<FriendEntity>>  findByRecipient(UserEntity loginUserEntity);
+    Optional<List<FriendEntity>> findAllByStatus(FriendStatus status);
 }

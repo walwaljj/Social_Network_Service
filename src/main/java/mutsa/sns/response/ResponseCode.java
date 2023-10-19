@@ -38,6 +38,7 @@ public enum ResponseCode {
     USER_FRIEND_REQUEST(HttpStatus.OK,"200","친구 신청 완료"),
     USER_FRIEND_CANCEL(HttpStatus.NO_CONTENT,"201","친구 취소 완료"),
     USER_FRIEND_REQUEST_ACCEPT(HttpStatus.OK,"200","친구 요청 수락 완료"),
+    USER_FRIEND_REQUEST_LIST(HttpStatus.OK,"200","친구 요청 조회 완료"),
     USER_FRIEND_REQUEST_REFUSE(HttpStatus.NO_CONTENT,"201","친구 요청 거절 완료"),
     USER_FRIEND_ARTICLE_LIST(HttpStatus.OK,"200","친구들의 게시글 조회 완료"),
     USER_FRIENDS_LIST(HttpStatus.OK,"200","친구 목록 조회 완료");

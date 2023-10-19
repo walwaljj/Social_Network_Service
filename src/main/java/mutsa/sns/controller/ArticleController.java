@@ -35,12 +35,13 @@ public class ArticleController {
                                                                   @RequestParam String content) throws IOException {
         ResponseCode articleCreate = ResponseCode.ARTICLE_CREATE;
 
+        articleService.write(auth.getName(), image, title, content);
+
         return ResponseEntity.ok(
                 CommonResponse.builder()
                         .responseCode(articleCreate)
                         .code(articleCreate.getCode())
                         .message(articleCreate.getMessage())
-                        .data(articleService.write(auth.getName(), image, title, content))
                         .build()
         );
     }
@@ -95,12 +96,13 @@ public class ArticleController {
 
         ResponseCode articleUpdate = ResponseCode.ARTICLE_UPDATE;
 
+        articleService.updateArticle(articleId, auth.getName(), title, content, image);
+
         return ResponseEntity.ok(
                 CommonResponse.builder()
                         .responseCode(articleUpdate)
                         .code(articleUpdate.getCode())
                         .message(articleUpdate.getMessage())
-                        .data(articleService.updateArticle(articleId, auth.getName(), title, content, image))
                         .build());
     }
 
